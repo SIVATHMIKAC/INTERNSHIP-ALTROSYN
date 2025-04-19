@@ -1,54 +1,79 @@
-// Wait for LinkedIn filters to load
-setTimeout(() => {
-    // Click "Sort by"
-    const sortButton = document.querySelector('button[aria-label^="Sort by"]');
-    if (sortButton) {
-        sortButton.click();
-        setTimeout(() => {
-            const topMatchOption = Array.from(document.querySelectorAll('span'))
-                .find(el => el.textContent.includes("Top match"));
-            if (topMatchOption) {
-                topMatchOption.click();
-                console.log("✅ Applied: Sort by Top match");
-            } else {
-                console.warn("❌ 'Top match' option not found");
-            }
-        }, 1000);
+(async () => {
+  function delay(ms) {
+    return new Promise(res => setTimeout(res, ms));
+  }
+
+  async function clickDropdownAndSelect(dropdownLabel, optionText) {
+    const buttons = [...document.querySelectorAll('button, span')];
+    const dropdown = buttons.find(el => el.innerText.trim() === dropdownLabel);
+    if (!dropdown) {
+      console.error(`Dropdown "${dropdownLabel}" not found`);
+      return;
     }
 
-    // Click "Date posted" filter
-    setTimeout(() => {
-        const dateFilter = document.querySelector('button[aria-label*="Date posted"]');
-        if (dateFilter) {
-            dateFilter.click();
-            setTimeout(() => {
-                const past24Hours = Array.from(document.querySelectorAll('span'))
-                    .find(el => el.textContent.includes("Past 24 hours"));
-                if (past24Hours) {
-                    past24Hours.click();
-                    console.log("✅ Applied: Date posted - Past 24 hours");
-                } else {
-                    console.warn("❌ 'Past 24 hours' option not found");
-                }
-            }, 1000);
-        }
-    }, 2000);
+    dropdown.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    dropdown.click();
+    await delay(1000);
 
-    // Click "Content type" filter
-    setTimeout(() => {
-        const typeFilter = document.querySelector('button[aria-label*="Content type"]');
-        if (typeFilter) {
-            typeFilter.click();
-            setTimeout(() => {
-                const videoOption = Array.from(document.querySelectorAll('span'))
-                    .find(el => el.textContent.includes("Videos"));
-                if (videoOption) {
-                    videoOption.click();
-                    console.log("✅ Applied: Content type - Videos");
-                } else {
-                    console.warn("❌ 'Videos' option not found");
-                }
-            }, 1000);
-        }
-    }, 4000);
-}, 2000);
+    const options = [...document.querySelectorAll('li span, li div, span')];
+    const match = options.find(el => el.innerText.trim() === optionText);
+    if (match) {
+      match.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      await delay(500);
+      match.click();
+    } else {
+      console.error(`Option "${optionText}" not found in "${dropdownLabel}"`);
+    }
+
+    await delay(1000);
+  }
+
+  async function applyFilterInputs(labelText, inputText, placeholder = "Add") {
+    const labels = [...document.querySelectorAll('label, span, div')];
+    const targetLabel = labels.find(el => el.innerText.trim() === labelText);
+    if (!targetLabel) {
+      console.error(`Filter label "${labelText}" not found`);
+      return;
+    }
+
+    await delay(500);
+
+    const input = [...document.querySelectorAll('input[placeholder]')].find(el =>
+      el.placeholder.toLowerCase().includes(placeholder.toLowerCase())
+    );
+
+    if (input) {
+      input.focus();
+      await delay(300);
+      input.value = inputText;
+
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      await delay(500);
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    } else {
+      console.error(`Input for "${labelText}" not found`);
+    }
+
+    await delay(1000);
+  }
+
+  console.log("🎯 Starting filter automation like a human...");
+
+  // Selecting filters one by one
+  await delay(2000);
+  await clickDropdownAndSelect("Sort by", "Top match");
+  await clickDropdownAndSelect("Date posted", "Past week");
+  await clickDropdownAndSelect("Content type", "Documents");
+
+  // Applying input filters
+  await applyFilterInputs("From member", "Dr.Sumathi s", "Add a person's name");
+  await applyFilterInputs("From company", "St Joseph's University", "Add a company's name");
+  await applyFilterInputs("Mentioning member", "Dr.Sumathi s", "Add a person's name");
+  await applyFilterInputs("Mentioning company", "St Joseph's University", "Add a company's name");
+  await applyFilterInputs("Author industry", "Research Services", "Add an industry");
+  await applyFilterInputs("Author company", "St Joseph's University", "Add a company");
+  await applyFilterInputs("Title", "AI researcher", "Add a title");
+
+  console.log("✅ All filters applied like a human!");
+
+})();
