@@ -1,0 +1,54 @@
+// Wait for LinkedIn filters to load
+setTimeout(() => {
+    // Click "Sort by"
+    const sortButton = document.querySelector('button[aria-label^="Sort by"]');
+    if (sortButton) {
+        sortButton.click();
+        setTimeout(() => {
+            const topMatchOption = Array.from(document.querySelectorAll('span'))
+                .find(el => el.textContent.includes("Top match"));
+            if (topMatchOption) {
+                topMatchOption.click();
+                console.log("✅ Applied: Sort by Top match");
+            } else {
+                console.warn("❌ 'Top match' option not found");
+            }
+        }, 1000);
+    }
+
+    // Click "Date posted" filter
+    setTimeout(() => {
+        const dateFilter = document.querySelector('button[aria-label*="Date posted"]');
+        if (dateFilter) {
+            dateFilter.click();
+            setTimeout(() => {
+                const past24Hours = Array.from(document.querySelectorAll('span'))
+                    .find(el => el.textContent.includes("Past 24 hours"));
+                if (past24Hours) {
+                    past24Hours.click();
+                    console.log("✅ Applied: Date posted - Past 24 hours");
+                } else {
+                    console.warn("❌ 'Past 24 hours' option not found");
+                }
+            }, 1000);
+        }
+    }, 2000);
+
+    // Click "Content type" filter
+    setTimeout(() => {
+        const typeFilter = document.querySelector('button[aria-label*="Content type"]');
+        if (typeFilter) {
+            typeFilter.click();
+            setTimeout(() => {
+                const videoOption = Array.from(document.querySelectorAll('span'))
+                    .find(el => el.textContent.includes("Videos"));
+                if (videoOption) {
+                    videoOption.click();
+                    console.log("✅ Applied: Content type - Videos");
+                } else {
+                    console.warn("❌ 'Videos' option not found");
+                }
+            }, 1000);
+        }
+    }, 4000);
+}, 2000);
